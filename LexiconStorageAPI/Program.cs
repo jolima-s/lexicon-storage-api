@@ -1,4 +1,8 @@
+using Microsoft.EntityFrameworkCore;
 var builder = WebApplication.CreateBuilder(args);
+var connectionString = builder.Configuration.GetConnectionString("LexiconStorageAPIContext") ?? throw new InvalidOperationException("Connection string 'LexiconStorageAPIContext' not found.");
+
+builder.Services.AddDbContext<LexiconStorageAPIContext>(options => options.UseSqlite(connectionString));
 
 // Add services to the container.
 
