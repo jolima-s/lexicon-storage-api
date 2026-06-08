@@ -20,15 +20,13 @@ namespace LexiconStorageAPI.Models
         [MaxLength(30)]
         public string Category { get; set; } = string.Empty;
 
-        [Required]
         [MaxLength(10)]
-        public string Shelf { get; set; } = string.Empty;
+        public string? Shelf { get; set; } = string.Empty;
 
         [Range(0, int.MaxValue)]
         public int Count { get; set; }
 
-        [Required]
         [MaxLength(200)]
-        public string Description { get; set; } = string.Empty;
+        public string? Description { get; set; } = string.Empty;
     }
 }
