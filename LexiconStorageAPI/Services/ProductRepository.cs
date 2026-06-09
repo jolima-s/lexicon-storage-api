@@ -17,6 +17,13 @@ namespace LexiconStorageAPI.Services
             return await _context.Products.ToListAsync();
         }
 
+        public async Task<IEnumerable<Product>> GetProductsByCategory(string category)
+        {
+            return await _context.Products
+                .Where(p => p.Category.ToLower() == category.ToLower())
+                .ToListAsync();
+        }
+
         public async Task<Product?> GetProduct(int? id)
         {
             return await _context.Products.FindAsync(id);

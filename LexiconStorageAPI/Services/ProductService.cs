@@ -20,6 +20,21 @@ namespace LexiconStorageAPI.Services
                 Name = p.Name,
                 Price = p.Price,
                 Count = p.Count,
+                Category = p.Category,
+                Description = p.Description
+            });
+        }
+
+        public async Task<IEnumerable<ProductDto>> GetProductsByCategory(string category)
+        {
+            var products = await _productRepository.GetProductsByCategory(category);
+            return products.Select(p => new ProductDto
+            {
+                Id = p.Id,
+                Name = p.Name,
+                Price = p.Price,
+                Count = p.Count,
+                Category = p.Category,
                 Description = p.Description
             });
         }
@@ -36,6 +51,7 @@ namespace LexiconStorageAPI.Services
                 Name = product.Name,
                 Price = product.Price,
                 Count = product.Count,
+                Category = product.Category,
                 Description = product.Description
             };
         }
@@ -63,6 +79,7 @@ namespace LexiconStorageAPI.Services
                 Name = createdProduct.Name,
                 Price = createdProduct.Price,
                 Count = createdProduct.Count,
+                Category= createdProduct.Category,
                 Description = createdProduct.Description
             };
         }

@@ -14,10 +14,18 @@ public class ProductsController : ControllerBase
 
     // GET: api/products
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<ProductDto>>> GetProducts()
+    public async Task<ActionResult<IEnumerable<ProductDto>>> GetProducts(string? category = null)
     {
-        var products = await _productService.GetAllProducts();
-        return Ok(products);
+        if (string.IsNullOrEmpty(category))
+        {
+            var products = await _productService.GetAllProducts();
+            return Ok(products);
+        }
+        else
+        {
+            var products = await _productService.GetProductsByCategory(category);
+            return Ok(products);
+        }
     }
 
     // GET: api/products/5
@@ -73,5 +81,24 @@ public class ProductsController : ControllerBase
         return NoContent();
     }
 
-    
+    // GET: api/products/stats
+    [HttpGet("stats")]
+    public async Task<ActionResult<ProductStatsDto>> GetProductStats()
+    {
+        var products = await _productService.GetAllProducts();
+
+        if (products == null || !products.Any())
+            return Ok(new ProductStatsDto { TotalCount = 0, TotalNetWorth = 0, AvgPrice = 0 });
+
+        var stats = new ProductStatsDto
+        {
+            TotalCount = products.Sum(p => p.Count),
+            TotalNetWorth = products.Sum(p => p.InventoryValue),
+            AvgPrice = products.Any()
+                ? (int)products.Average(p => p.Price)
+                : 0
+        };
+
+        return Ok(stats);
+    }
 }
