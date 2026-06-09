@@ -1,98 +1,77 @@
+using LexiconStorageAPI.DTOs;
+using LexiconStorageAPI.Services;
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using LexiconStorageAPI.Models;
 
-[Route("api/[controller]")]
+[Route("api/products")]
 [ApiController]
 public class ProductsController : ControllerBase
 {
-    private readonly LexiconStorageAPIContext _context;
-    public ProductsController(LexiconStorageAPIContext context)
+    private readonly ProductService _productService;
+    public ProductsController(ProductService productService)
     {
-        _context = context;
+        _productService = productService;
     }
 
-    // GET: api/Product
+    // GET: api/products
     [HttpGet]
-    public async Task<ActionResult<IEnumerable<Product>>> GetProduct()
+    public async Task<ActionResult<IEnumerable<ProductDto>>> GetProducts()
     {
-        return await _context.Product.ToListAsync();
+        var products = await _productService.GetAllProducts();
+        return Ok(products);
     }
 
-    // GET: api/Product/5
+    // GET: api/products/5
     [HttpGet("{id}")]
-    public async Task<ActionResult<Product>> GetProduct(int id)
+    public async Task<ActionResult<ProductDto>> GetProduct([FromRoute] int id)
     {
-        var product = await _context.Product.FindAsync(id);
+        var product = await _productService.GetProductById(id);
 
         if (product == null)
-        {
             return NotFound();
-        }
 
         return product;
     }
 
-    // PUT: api/Product/5
+    // PUT: api/products/5
     // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
     [HttpPut("{id}")]
-    public async Task<IActionResult> PutProduct(int? id, Product product)
+    public async Task<IActionResult> PutProduct(int? id, UpdateProductDto updateProductDto)
     {
-        if (id != product.Id)
-        {
+        if (id != updateProductDto.Id)
             return BadRequest();
-        }
 
-        _context.Entry(product).State = EntityState.Modified;
+        var result = await _productService.UpdateProduct(id, updateProductDto);
 
-        try
-        {
-            await _context.SaveChangesAsync();
-        }
-        catch (DbUpdateConcurrencyException)
-        {
-            if (!ProductExists(id))
-            {
-                return NotFound();
-            }
-            else
-            {
-                throw;
-            }
-        }
+        if (!result)
+            return NotFound();
 
         return NoContent();
     }
 
-    // POST: api/Product
+    // POST: api/products
     // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
     [HttpPost]
-    public async Task<ActionResult<Product>> PostProduct(Product product)
+    public async Task<ActionResult<ProductDto>> PostProduct(CreateProductDto createProductDto)
     {
-        _context.Product.Add(product);
-        await _context.SaveChangesAsync();
+        var result = await _productService.CreateProduct(createProductDto);
 
-        return CreatedAtAction("GetProduct", new { id = product.Id }, product);
+        if (result == null)
+            return BadRequest();
+
+        return CreatedAtAction("GetProduct", new { id = result.Id }, result);
     }
 
-    // DELETE: api/Product/5
+    // DELETE: api/products/5
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteProduct(int? id)
     {
-        var product = await _context.Product.FindAsync(id);
-        if (product == null)
-        {
-            return NotFound();
-        }
+        var response = await _productService.DeleteProduct(id);
 
-        _context.Product.Remove(product);
-        await _context.SaveChangesAsync();
+        if (!response)
+            return NotFound();
 
         return NoContent();
     }
 
-    private bool ProductExists(int? id)
-    {
-        return _context.Product.Any(e => e.Id == id);
-    }
+    
 }

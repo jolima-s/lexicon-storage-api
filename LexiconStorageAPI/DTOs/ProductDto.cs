@@ -1,7 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-using System.ComponentModel.DataAnnotations.Schema;
-
-namespace LexiconStorageAPI.DTOs
+﻿namespace LexiconStorageAPI.DTOs
 {
     public class ProductDto
     {
